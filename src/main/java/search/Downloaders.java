@@ -9,7 +9,7 @@ import org.jsoup.select.*;
 public class Downloaders {
     public static void main(String[] args) {
         try {
-            Gate index = (Gate) LocateRegistry.getRegistry(8183).lookup("gateway");
+            Gate gate = (Gate) LocateRegistry.getRegistry(8183).lookup("gateway");
             while (true) {
                 try{
                     String url = index.takeNext();               

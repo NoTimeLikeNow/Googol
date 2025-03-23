@@ -4,14 +4,14 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.io.*;
 import java.util.*;
-
 
 public class IndexStorageBarrel extends UnicastRemoteObject implements Index {
     BlockingQueue<String> urlsToIndex;
 
-    ConcurrentHashMap<String, CopyOnWriteArrayList<String>> indexedItems;
+    ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> indexedItems;
  
     public IndexStorageBarrel() throws RemoteException {
         super();
@@ -23,7 +23,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index {
     public static void main(String args[]) {
         try {
             IndexStorageBarrel server = new IndexStorageBarrel();
-            Registry registry = LocateRegistry.createRegistry(8183);
+            Registry registry = LocateRegistry.createRegistry(Integer.parseInt(args[0]));
             registry.rebind("IndexStorageBarrel", server);
             String input = "";
             Scanner scanner = new Scanner(System.in);
@@ -67,20 +67,21 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index {
 
     public void addToIndex(String word, String url) throws java.rmi.RemoteException {
         //ensure the word is in the map, other methods aren't thread safe
-        indexedItems.computeIfAbsent(word,k -> new CopyOnWriteArrayList<>());
+        indexedItems.computeIfAbsent(word, k -> new ConcurrentHashMap<>());
     
         //ensure the URL entry is present 
-        indexedItems.get(word).add(url);
+        indexedItems.get(word).computeIfAbsent(url, k -> new AtomicInteger(0));
+    
     }
 
     
     public List<String> searchWord(String word) throws java.rmi.RemoteException {
         word = word.toLowerCase();
-        CopyOnWriteArrayList<String> urls = indexedItems.get(word);
+        ConcurrentHashMap<String, AtomicInteger> urls = indexedItems.get(word);
         
-        //avoids NullPointerException, God knows i had enough of those
+        //avoids NullPointerException, God knows we've all had enough of those
         if (urls == null) return Collections.emptyList(); 
         
-        return new ArrayList<>(urls);
+        return new ArrayList<>(urls.keySet());
     }
 }
