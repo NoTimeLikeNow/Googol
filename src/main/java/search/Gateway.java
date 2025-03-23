@@ -10,13 +10,11 @@ import java.util.*;
 
 public class Gateway extends UnicastRemoteObject implements Gate {
     BlockingQueue<String> urlsToIndex;
-
-    ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> indexedItems;
+    CopyOnWriteArrayList<String> Barrels;
 
     public Gateway() throws RemoteException {
         super();
         urlsToIndex = new LinkedBlockingQueue<String>();   
-        indexedItems = new ConcurrentHashMap<>();    
     }
 
 
@@ -28,9 +26,11 @@ public class Gateway extends UnicastRemoteObject implements Gate {
             String input = "";
             Scanner scanner = new Scanner(System.in);
             server.putNew("https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:P%C3%A1gina_principal");
+
             while (!"endSearch".equalsIgnoreCase(input)){
                 System.out.println("Server ready. Waiting for input...");
                 input = scanner.nextLine();
+
                 List<String> result =  server.searchWord(input);
                 for (String s : result) System.out.println(s);
             }
@@ -65,24 +65,10 @@ public class Gateway extends UnicastRemoteObject implements Gate {
 
     }
 
-    public void addToIndex(String word, String url) throws java.rmi.RemoteException {
-        //ensure the word is in the map, other methods aren't thread safe
-        indexedItems.computeIfAbsent(word, k -> new ConcurrentHashMap<>());
-    
-        //ensure the URL entry is present 
-        indexedItems.get(word).computeIfAbsent(url, k -> new AtomicInteger(0));
-    
-        //increment the count
-        indexedItems.get(word).get(url).incrementAndGet();
-    }
-
     
     public List<String> searchWord(String word) throws java.rmi.RemoteException {
         word = word.toLowerCase();
-        ConcurrentHashMap<String, AtomicInteger> urls = indexedItems.get(word);
-        
-        //avoids NullPointerException, God knows i had enough of those
-        if (urls == null) return Collections.emptyList(); 
+    
         
         return new ArrayList<>(urls.keySet());
     }
