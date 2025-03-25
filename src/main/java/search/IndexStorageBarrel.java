@@ -11,12 +11,23 @@ import java.util.*;
 public class IndexStorageBarrel extends UnicastRemoteObject implements Index {
     BlockingQueue<String> urlsToIndex;
 
-    ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> indexedItems;
+    ConcurrentHashMap<String, Set<String>> indexedItems;
+    ConcurrentHashMap<String, ConcurrentHashMap<String, Boolean>> foundURLs;
+
+    // Custom comparator to sort by the size of the set
+    Comparator<String> comparator = Comparator.<String>comparingInt(key -> foundURLs.get(key).size()).reversed();
+
+    ConcurrentSkipListMap <String, ConcurrentHashMap<String, Set<String>>> rankings;
+
+
  
     public IndexStorageBarrel() throws RemoteException {
         super();
         urlsToIndex = new LinkedBlockingQueue<String>();   
-        indexedItems = new ConcurrentHashMap<>();    
+        indexedItems = new ConcurrentHashMap<>();   
+        foundURLs = new ConcurrentHashMap<>();
+        rankings = new ConcurrentSkipListMap<>(comparator);
+
     }
 
 
@@ -25,63 +36,71 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index {
             IndexStorageBarrel server = new IndexStorageBarrel();
             Registry registry = LocateRegistry.createRegistry(Integer.parseInt(args[0]));
             registry.rebind("IndexStorageBarrel", server);
-            String input = "";
-            Scanner scanner = new Scanner(System.in);
-            server.putNew("https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:P%C3%A1gina_principal");
-            while (!"endSearch".equalsIgnoreCase(input)){
-                System.out.println("Server ready. Waiting for input...");
-                input = scanner.nextLine();
-                List<String> result =  server.searchWord(input);
-                for (String s : result) System.out.println(s);
-            }
-            scanner.close();
+
             
         
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+        while(true);
     }
 
     private long counter = 0, timestamp = System.currentTimeMillis();;
 
-    public String takeNext() throws RemoteException {
-        String temp;
-        try {
-            temp = urlsToIndex.take(); //sleeps if the queue is empty
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); //restore interrupted status
-            throw new RemoteException("Thread interrupted while adding URL to queue", e);
+  
+
+    public void addToIndex(Set<String> words, String url, String title, Set<String> links) throws java.rmi.RemoteException{
+        synchronized(indexedItems){
+            for(String word : words){   
+                indexedItems.computeIfAbsent(word, k -> new HashSet<>());
+                
+                indexedItems.get(word).add(url);
+            }
         }
-        return temp;
-    }
+        
+        for(String link : links){   
+            synchronized(foundURLs){
+                foundURLs.computeIfAbsent(link, k -> new ConcurrentHashMap<>());
+                
+                foundURLs.get(link).putIfAbsent(url, false);
+            }
+            synchronized(rankings){
+                //ERRO
+                rankings.computeIfAbsent(link, k -> new ConcurrentHashMap<>());
+                
+                rankings.get(link).computeIfAbsent(title, k -> new HashSet<>());
 
-    public void putNew(String url) throws java.rmi.RemoteException {
-        try {
-            urlsToIndex.put(url);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); //restore interrupted status
-            throw new RemoteException("Thread interrupted while adding URL to queue", e);
+                rankings.get(link).get(title).add(url);
+            }
         }
+        
 
     }
 
-    public void addToIndex(String word, String url) throws java.rmi.RemoteException {
-        //ensure the word is in the map, other methods aren't thread safe
-        indexedItems.computeIfAbsent(word, k -> new ConcurrentHashMap<>());
     
-        //ensure the URL entry is present 
-        indexedItems.get(word).computeIfAbsent(url, k -> new AtomicInteger(0));
-    
-    }
-
-    
-    public List<String> searchWord(String word) throws java.rmi.RemoteException {
-        word = word.toLowerCase();
-        ConcurrentHashMap<String, AtomicInteger> urls = indexedItems.get(word);
+    public List<String> searchWord(String search) throws java.rmi.RemoteException {
+        search = search.toLowerCase();
+        String[] words = search.split(search, ' ');
+        ArrayList<String> results;
+        
+        Set<String> urls = indexedItems.get(words[0]);
+        for (String word : words){
+            urls.retainAll(indexedItems.get(word));
+        }
         
         //avoids NullPointerException, God knows we've all had enough of those
-        if (urls == null) return Collections.emptyList(); 
+        if (urls == null || urls.isEmpty()) return Collections.emptyList(); 
         
-        return new ArrayList<>(urls.keySet());
+        Set<String> temp = rankings.keySet();
+        for (String url : temp){
+            for(String result : urls){
+                if (temp.contains(result)) {
+                    results.add(ranking.get(result))
+                }
+            }
+        }
+        
+        return results;
     }
 }
