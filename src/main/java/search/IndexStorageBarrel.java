@@ -11,7 +11,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index, Se
     Set<String> indexUrls;
     ConcurrentHashMap<String, ArrayList<String>> pageInfo;
     ConcurrentHashMap<String, Set<String>> indexedItems;
-    
     ConcurrentHashMap<String, Set<String>> foundURLs;
 
     // Custom comparator to sort by the size of the set

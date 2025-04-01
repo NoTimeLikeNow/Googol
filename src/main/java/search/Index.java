@@ -4,7 +4,7 @@ import java.rmi.*;
 import java.util.*;
 
 public interface Index extends Remote {    
-    //indices words,adds the url into the ranking, and saves the url's title
+    //indixes words,adds the url into the ranking, and saves the url's title
     public void addToIndex(Set<String> words, String url, String title, String summary, Set<String> links) throws java.rmi.RemoteException;
     public void rollBack(Set<String> words, String url, String title, String summary, Set<String> links) throws java.rmi.RemoteException;
     public void multicast(Set<String> words, String url, String title, String summary, Set<String> links, List<String> barrels) throws java.rmi.RemoteException;
