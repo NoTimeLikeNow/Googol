@@ -1,8 +1,9 @@
-Como executar numa situação normal:
-Para instalar os components deste sistema distribuido: É necessário ter instalda a biblioteca jsoup, neste caso já a disponibilizamos na pasta target/lib.
-E fazer a compilação dos ficheiros para o seu sitema operativo, executando o ficheiro build apropriado ao seu sistema (.cmd (windows)) num terminal aberto na pasta onde se encontram. Pode ainda compilar manualmente todos os ficheiros na pasta src/main/java/search, não se esqueça de incluir a biblioteca jsoup na compilação (Ex.: javac -d ../../../target/ -cp ../../../target/lib/jsoup-1.18.3.jar search/*.java)
+Como usar:
+Para instalar os components deste sistema distribuido: É necessário ter instalda/descarregada a biblioteca jsoup, neste caso já a disponibilizamos na pasta target/lib.
+Faça a compilação dos ficheiros para o seu sitema operativo, executando o ficheiro build apropriado ao seu sistema (.cmd (windows) .sh Unix encoding) num terminal aberto na pasta onde se encontram. Pode ainda compilar manualmente todos os ficheiros na pasta src/main/java/search, não se esqueça de incluir a biblioteca jsoup na compilação (Ex.: javac -d ../../../target/ -cp ../../../target/lib/jsoup-1.18.3.jar search/*.java)
 
-Qualquer parte do sistema distribuido pode ser iniciado pelo ficheiro de execução apropriado em qualquer ordem, tendo só que ter em atenção as portas e os ips que devem ser mudados para as para referirem as maquinas certas ou utilizar uma porta desocupada:
+Comece por iniciar o gateWay
+Qualquer outra parte do sistema distribuido pode ser iniciado pelo ficheiro de execução apropriado em qualquer ordem, tendo só que ter em atenção as portas e os ips que devem ser mudados para as para referirem as maquinas certas ou utilizar uma porta desocupada:
 
 run-gateway
 cd target/

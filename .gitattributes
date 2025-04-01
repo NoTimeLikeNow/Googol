@@ -1,5 +1,9 @@
-# Keep LF for all files
-* text=auto eol=lf
+# Force ld only for .sh files
+*.sh text eol=lf
 
 # Force CRLF only for .cmd files
 *.cmd text eol=crlf
+
+#leave everything else as is
+* text=auto 
+*.obj binary

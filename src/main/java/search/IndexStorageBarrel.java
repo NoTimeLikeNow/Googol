@@ -46,7 +46,8 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index, Se
                             temp = index.getIndexState();
                             gateway.addBarrel(connection,true); //lock
                         } catch (Exception e){
-                            System.out.println("Couldn't reach barrel");
+                            e.printStackTrace();
+                            System.out.println("\n -------------------\n Couldn't reach barrel");
                             continue;
                             
                         }
@@ -138,6 +139,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index, Se
                     Index barrel = (Index) LocateRegistry.getRegistry(connection[0], Integer.parseInt(connection[1])).lookup("Index");
                     commits.add(barrel);
                 }catch(Exception e){
+                    //System.out.println("Rollback failed to commit");
                     throw new RemoteException("Rollback...");
                 }
             }
@@ -152,6 +154,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index, Se
 
                         }
                     }
+                    //System.out.println("Rollback failed to add");
                    return;
                 }
             }
