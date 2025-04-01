@@ -41,9 +41,10 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Index, Se
                         String [] ipport = ip_port.split (" ");
                         ArrayList<Object> temp;
                         try{
-                            index = (Index)LocateRegistry.getRegistry (ipport[0], Integer.parseInt(ipport[1])).lookup("barrel");
+                            index = (Index)LocateRegistry.getRegistry (ipport[0], Integer.parseInt(ipport[1])).lookup("Index");
                             temp = index.getIndexState();
                             gateway.addBarrel(connection,true); //lock
+                            System.out.println("Updating from existing Barrel. Might take some time...");
                         } catch (Exception e){
                             e.printStackTrace();
                             System.out.println("\n -------------------\n Couldn't reach barrel");

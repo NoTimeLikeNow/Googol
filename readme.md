@@ -35,4 +35,9 @@ cd ..
 
 
 
-Estes ficheiros devem ser executados num terminal diferente para cada parte do sistema, na pasta onde eles se encontram. Pode ainda executar diretamente na consola usando os comandos acima referidos, apropriado-os ao seu sistema operativo caso necessário, diretamente na consola.
+Estes ficheiros devem ser executados num terminal diferente para cada parte do sistema, na pasta onde eles se encontram. Pode ainda executar diretamente na consola usando os comandos acima referidos, apropriado-os ao seu sistema operativo caso necessário, diretamente na consola
+
+
+Uma vez executado o client Client. Links fornecidos seram automaticamente reconhecidos, adicionados para indexar se não foram ainda ou será devolvido em grupos de 10 os websites que referenciam esse link. Use a letra "b" para interromper o output.
+
+Pode ainda colocar conjuntos de palavras para pesquisar websites relevantes.

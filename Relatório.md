@@ -87,7 +87,7 @@ Relatório da Meta 1 do Projeto Googol de SD
     Barrel guarda o seu estado e recupera o seu estado com sucesso quando reiniciado.
     Multicast verificado. Ambos os barrels apresentam a mesma informação quando forçadamente falhados numa mudança não fazem as alterações pedidas. Check
 
-    Barrel novo iniciado quando já existe um outro index aberto. Atualização de estados por via outro Barrel
+    Barrel novo iniciado quando já existe um outro index aberto. Atualização de estados por via outro Barrel CHECk Note Takes a really long time when the index has gotten over a few megabytes not recommended Tested with 22 megabytes;
 
 
 
